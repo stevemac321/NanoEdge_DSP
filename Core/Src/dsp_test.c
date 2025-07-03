@@ -4,7 +4,7 @@
  *  Created on: Jun 30, 2025
  *      Author: steve
  */
-//#include "stm32f4xx_hal.h"   // Or whatever matches your STM32 series
+
 #include <dsp_test.h>
 
 extern ADC_HandleTypeDef hadc1;
@@ -47,25 +47,7 @@ void ru_vec_attach(struct ru_vec *v, const struct ru_vec* old)
     v->pbuf = old->pbuf;
     v->len = old->len;
 }
-#if 0
-// reset for those who use the buffers extern
-void reset_dsp_buffers(void)
-{
-    for (int i = 0; i < ADC_SIZE; i++) {
-        adc_samples[i] = 0.0f;
-        filtered_samples[i] = 0.0f;
-        fft_magnitude[i] = 0.0f;
-    }
 
-    for (int i = 0; i < FFT_BUFFER_SIZE; i++) {
-        fft_input[i] = 0.0f;
-    }
-
-    for (int i = 0; i < ADC_SIZE + FIR_TAP_NUM + 1; i++) {
-        firState[i] = 0.0f;
-    }
-}
-#endif
 void Temp_ADC1_Init(void)
 {
   ADC_ChannelConfTypeDef sConfig = {0};
