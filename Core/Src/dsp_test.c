@@ -23,19 +23,21 @@ dsp_fn dsp_tests[] = {
     test_clock_drift,
 };
 
-float adc_samples[ADC_SIZE] = {0};
-float filtered_samples[ADC_SIZE] = {0};
-float fft_input[FFT_BUFFER_SIZE] = {0};
-float fft_magnitude[ADC_SIZE] = {0};
+float buffer0_128[128] = {0}; //e.g. adc_samples
+float buffer1_128[128] = {0}; //e.g filtered samples
+float buffer2_128[128] = {0}; //e.g fft_magnitude
+float buffer0_256[256] = {0}; // e.g. fft_input
+
+
 const float firCoeffs[FIR_TAP_NUM] = {0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 float firState[ADC_SIZE + FIR_TAP_NUM + 1];  // CMSIS requires: state length = numTaps + blockSize - 1
 
 // ru_vec implementation
 
-float ru_buffer[1024] = {0};
-void ru_vec_init(struct ru_vec *v, float *pbuf, uint16_t length)
+void ru_vec_init(struct ru_vec *v, float *pbuf, const uint16_t length, const uint16_t capacity)
 {
 	// zero initialize
+	v->pbuf = pbuf;
 	memset(v->pbuf, 0, length * sizeof(float));
 	v->len = length;
 }
@@ -45,6 +47,7 @@ void ru_vec_attach(struct ru_vec *v, const struct ru_vec* old)
     v->pbuf = old->pbuf;
     v->len = old->len;
 }
+#if 0
 // reset for those who use the buffers extern
 void reset_dsp_buffers(void)
 {
@@ -62,6 +65,7 @@ void reset_dsp_buffers(void)
         firState[i] = 0.0f;
     }
 }
+#endif
 void Temp_ADC1_Init(void)
 {
   ADC_ChannelConfTypeDef sConfig = {0};

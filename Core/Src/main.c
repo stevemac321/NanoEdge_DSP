@@ -102,18 +102,16 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  dsp_tests[0]();
-  dsp_tests[1]();
-  dsp_tests[0]();
-  dsp_tests[1]();
-  dsp_tests[2]();
-  dsp_tests[3]();
-  dsp_tests[4]();
-  dsp_tests[5]();
-  dsp_tests[6]();
-  dsp_tests[7]();
-  dsp_tests[8]();
-  dsp_tests[9]();
+  dsp_tests[DSP_TEST_VOLTAGE]();
+  dsp_tests[DSP_TEST_TEMPERATURE]();
+  dsp_tests[DSP_TEST_CPU_LOAD]();
+  dsp_tests[DSP_TEST_RAM_USAGE]();
+  dsp_tests[DSP_TEST_POWER_DRAW]();
+  dsp_tests[DSP_TEST_MCU_CORE_TEMP]();
+  dsp_tests[DSP_TEST_LOOP_JITTER]();
+  dsp_tests[DSP_TEST_UART_TRAFFIC]();
+  dsp_tests[DSP_TEST_ADC_NOISE_FLOOR]();
+  dsp_tests[DSP_TEST_CLOCK_DRIFT]();
 
   while (1)
   {
@@ -217,7 +215,6 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
-  //ADC->CCR |= ADC_CCR_TSVREFE; // enable temp sensor and VREFINT
   /* USER CODE END ADC1_Init 2 */
 
 }

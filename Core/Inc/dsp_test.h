@@ -16,18 +16,22 @@
 #define FFT_BUFFER_SIZE (2 * ADC_SIZE)      // Interleaved real + imag
 #define FIR_TAP_NUM    5
 
+#define CPU_LOAD_ITERATIONS 20
+
 #define REUSABLE_CAPACITY 1024
 #define DSP_TEST_COUNT 10
 #define DSP_TEST_ALL 15
 
-void reset_dsp_buffers(void);
+
+//void reset_dsp_buffers(void);
 
 struct ru_vec {
 	float * pbuf;
 	uint16_t len;
+	uint16_t cap;
 };
 
-void ru_vec_init(struct ru_vec *v, float *pbuf, uint16_t length); // zero initialize
+void ru_vec_init(struct ru_vec *v, float *pbuf, const uint16_t length, const uint16_t capacity); // zero initialize
 void ru_vec_attach(struct ru_vec *v, const struct ru_vec* old); // attaches with existing data
 
 typedef void (*dsp_fn)(void);
@@ -49,6 +53,10 @@ void test_clock_drift(void);
 float ADCToTemperature(uint32_t adc_val);
 void Temp_ADC1_Init(void);
 void Reset_ADC1_Init(void);
+void fill_stack_pattern(void);
+size_t get_stack_usage_bytes(void);
+uint16_t read_adc_raw(void);
+
 
 // array indexes
 // Constants (array indexes)

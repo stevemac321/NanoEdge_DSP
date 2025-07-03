@@ -40,6 +40,7 @@ _estack = ORIGIN(RAM) + LENGTH(RAM); /* end of "RAM" Ram type memory */
 
 _Min_Heap_Size = 0x1000; /* required amount of heap */
 _Min_Stack_Size = 0x1000; /* required amount of stack */
+_stack_start = _estack - _Min_Stack_Size; /* lowest address of the stack */
 
 /* Memories definition */
 MEMORY
