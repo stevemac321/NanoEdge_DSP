@@ -7,7 +7,6 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_adc.h"
 #include "arm_math.h"
-#include "stdio.h"
 #include "main.h"
 
 // Constants
@@ -22,8 +21,13 @@
 #define DSP_TEST_COUNT 10
 #define DSP_TEST_ALL 15
 
-
-//void reset_dsp_buffers(void);
+// Helper: Convert ADC raw to temperature (STM32 internal sensor formula)
+// Typical STM32 formula: Temp = ((V_SENSE - V_25)/Avg_Slope) + 25
+// Adjust these constants based on your STM32 datasheet or calibration
+#define VREF 3.3f
+#define ADC_RESOLUTION 4096.0f
+#define V_25 0.76f     // Voltage at 25°C, typical
+#define AVG_SLOPE 0.0025f  // Volts per °C, typical
 
 struct ru_vec {
 	float * pbuf;
@@ -31,8 +35,15 @@ struct ru_vec {
 	uint16_t cap;
 };
 
+struct ru_u32_vec {
+	uint32_t * pbuf;
+	uint16_t len;
+	uint16_t cap;
+};
+
 void ru_vec_init(struct ru_vec *v, float *pbuf, const uint16_t length, const uint16_t capacity); // zero initialize
-void ru_vec_attach(struct ru_vec *v, const struct ru_vec* old); // attaches with existing data
+void ru_u32_vec_init(struct ru_u32_vec *v, uint32_t *pbuf, const uint16_t length, const uint16_t capacity); // zero initialize
+
 
 typedef void (*dsp_fn)(void);
 
@@ -52,10 +63,15 @@ void test_clock_drift(void);
 //helpers
 float ADCToTemperature(uint32_t adc_val);
 void Temp_ADC1_Init(void);
+void Vrefint_ADC1_Init(void);
 void Reset_ADC1_Init(void);
 void fill_stack_pattern(void);
 size_t get_stack_usage_bytes(void);
 uint16_t read_adc_raw(void);
+float read_core_temp_celsius(void);
+float ADCToTemperature(uint32_t adc_val);
+void gather_tx_stats(const char *ptr, int len);
+uint32_t RTC_Get_Seconds(void);
 
 
 // array indexes

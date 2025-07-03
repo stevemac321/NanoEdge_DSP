@@ -4,7 +4,6 @@
  *  Created on: Jun 30, 2025
  *      Author: steve
  */
-
 #include <dsp_test.h>
 
 extern ADC_HandleTypeDef hadc1;
@@ -27,13 +26,12 @@ float buffer0_128[128] = {0}; //e.g. adc_samples
 float buffer1_128[128] = {0}; //e.g filtered samples
 float buffer2_128[128] = {0}; //e.g fft_magnitude
 float buffer0_256[256] = {0}; // e.g. fft_input
-
+uint32_t buffer0_u32_128[128] = {0}; // for timestamps
 
 const float firCoeffs[FIR_TAP_NUM] = {0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 float firState[ADC_SIZE + FIR_TAP_NUM + 1];  // CMSIS requires: state length = numTaps + blockSize - 1
 
-// ru_vec implementation
-
+// ru_vec implementation, for float
 void ru_vec_init(struct ru_vec *v, float *pbuf, const uint16_t length, const uint16_t capacity)
 {
 	// zero initialize
@@ -41,13 +39,13 @@ void ru_vec_init(struct ru_vec *v, float *pbuf, const uint16_t length, const uin
 	memset(v->pbuf, 0, length * sizeof(float));
 	v->len = length;
 }
-void ru_vec_attach(struct ru_vec *v, const struct ru_vec* old)
+void ru_u32_vec_init(struct ru_u32_vec *v, uint32_t *pbuf, const uint16_t length, const uint16_t capacity)
 {
-	// attaches with existing data
-    v->pbuf = old->pbuf;
-    v->len = old->len;
+	// zero initialize
+	v->pbuf = pbuf;
+	memset(v->pbuf, 0, length * sizeof(uint32_t));
+	v->len = length;
 }
-
 void Temp_ADC1_Init(void)
 {
   ADC_ChannelConfTypeDef sConfig = {0};
@@ -91,16 +89,7 @@ void Temp_ADC1_Init(void)
 
 void Reset_ADC1_Init(void)
 {
-
-  /* USER CODE BEGIN ADC1_Init 0 */
-
-  /* USER CODE END ADC1_Init 0 */
-
   ADC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN ADC1_Init 1 */
-
-  /* USER CODE END ADC1_Init 1 */
 
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
@@ -130,9 +119,14 @@ void Reset_ADC1_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN ADC1_Init 2 */
-  /* USER CODE END ADC1_Init 2 */
 
+}
+
+float ADCToTemperature(uint32_t adc_val)
+{
+    float v_sense = (adc_val * VREF) / ADC_RESOLUTION;
+    float temp = ((v_sense - V_25) / AVG_SLOPE) + 25.0f;
+    return temp;
 }
 
 

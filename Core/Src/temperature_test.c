@@ -19,22 +19,6 @@ extern float firCoeffs[FIR_TAP_NUM];
 // FIR filter instance
 static arm_fir_instance_f32 S;
 
-// Helper: Convert ADC raw to temperature (STM32 internal sensor formula)
-// Typical STM32 formula: Temp = ((V_SENSE - V_25)/Avg_Slope) + 25
-// Adjust these constants based on your STM32 datasheet or calibration
-#define VREF 3.3f
-#define ADC_RESOLUTION 4096.0f
-#define V_25 0.76f     // Voltage at 25°C, typical
-#define AVG_SLOPE 0.0025f  // Volts per °C, typical
-
-
-
-float ADCToTemperature(uint32_t adc_val)
-{
-    float v_sense = (adc_val * VREF) / ADC_RESOLUTION;
-    float temp = ((v_sense - V_25) / AVG_SLOPE) + 25.0f;
-    return temp;
-}
 
 void test_temperature(void)
 {
