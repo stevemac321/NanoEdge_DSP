@@ -34,10 +34,23 @@ Each signal contributes a dimension to the anomaly model. They’re derived from
 
 ---
 
+> **Note on Signal Structure:**  
+> In this project, each signal type (e.g. voltage, temperature, power draw) is processed individually and treated as a separate input to the NanoEdge model. While the term "multi-signal" is used to describe the broader capability of the system, signals are not fused into a single vector per inference window. Instead, each mode operates independently per signal, allowing modular capture, transformation, and evaluation.
+
+---
+
+| Mode              | Purpose                                           | Signal Handling                 |
+|------------------|---------------------------------------------------|----------------------------------|
+| `DSP_MODE`        | Visualize signals & DSP pre-processing            | Per-signal, printed to UART     |
+| `SIGNAL_FORMAT`   | Generate rows for training                        | One signal at a time            |
+| `INFERENCE_TEST`  | Run inference on fixed dataset                    | Full multi-signal array         |
+| `SELF_DIAG_MODE`  | Live inference with minimal output                | One active signal per run       |
+
+
 ### 🔁 Execution Modes
 
 #### 🔹 Mode 1: **Verbose DSP Logging**
-**When:** `SIGNAL_FORMAT` is **undefined** in `dsp_test.h`  
+**When:** `DSP_TEST` is **defined** in `dsp_test.h`  
 **Purpose:** Development & debugging  
 **Behavior:**
 - Logs full signal outputs via `printf`
