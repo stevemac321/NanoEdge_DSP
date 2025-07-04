@@ -54,7 +54,7 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 extern  dsp_fn dsp_tests[];
 extern const float signal_data[DATA_ROWS][DATA_INPUT_USER];
-float inf_call[DATA_INPUT_USER] = {0};
+extern float buffer0_128[DATA_INPUT_USER];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -408,14 +408,19 @@ int _write(int file, char *ptr, int len) {
     HAL_UART_Transmit(&huart2, (uint8_t*)ptr, len, HAL_MAX_DELAY);
     return len;
 }
+
 void inference()
 {
 	int total_outliers = 0;
+
+	struct ru_vec vinf_call;
+	ru_vec_init(&vinf_call, buffer0_128, 128, 128);
+
 	int i=0;
 	  for (; i < DATA_ROWS; i++) {
 	      uint8_t is_outlier= 0;
-	      memcpy(inf_call, signal_data[i], sizeof(inf_call));
-	      enum neai_state status = neai_oneclass(inf_call, &is_outlier);
+	      memcpy(vinf_call.pbuf, signal_data[i], 128 * sizeof(float));
+	      enum neai_state status = neai_oneclass(vinf_call.pbuf, &is_outlier);
 	      if(is_outlier) {
 	    	  total_outliers++;
 	      }
@@ -424,7 +429,6 @@ void inference()
 
 	  printf("Total Rows: %d, Total Outliers %d\r\n", i, total_outliers);
 }
-
 /* USER CODE END 4 */
 
 /**
