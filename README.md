@@ -1,14 +1,9 @@
-
-
 ## DSP Project for Multi-Signal NanoEdge Outlier Detection
+Features: CMSIS/DSP functions applied to actual data from the microcontroler, reduced memory footprint with reusable buffers, const qualifier to place the big inference data in SRAM, NanoEdge trained Outlier mulit-signal model, different modes of execution.
 
 **Reusable Buffers · CMSIS-DSP · STM32**
 
-I'm still working on this, but the core DSP infrastructure is now code-complete.
-
 ---
-
-### ✅ Current Status
 
 Each signal below represents a potential *dimension* in a NanoEdge AI "Outlier Detection" model. Signals are derived from real hardware sensors or internal metrics and processed using CMSIS-DSP or basic math.
 
@@ -25,21 +20,17 @@ Each signal below represents a potential *dimension* in a NanoEdge AI "Outlier D
 | **ADC Noise Floor** (idle)            | FFT-based fingerprinting                       |
 | **Internal Clock Drift**              | Time-domain deltas vs. RTC, anomaly detection  |
 
-I just completed the UART printout of results from the DSP operations — it prints usable diagnostic output and FFT magnitudes.
-
 ---
 
-### 🔧 Next Steps
 
-The next design decision is how to organize *modes of operation*. These will control the verbosity, output formatting, and intent of the device.
 
-#### Mode 1: **Verbose Diagnostic**
+#### Mode 1: **Verbose DSP logging: SIGNAL_FORMAT NOT defined in dsp_test.h**
 
 * Prints all data via `printf`
 * Used during development/debugging
 * May output raw ADC, FFT bins, drift values
 
-#### Mode 2: **Data Collection for Training**
+#### Mode 2: **Data Collection for Training: SIGNAL_FORMAT defined in DSP_test.h**
 
 * Outputs one signal per row
 * Each row = 128 elements (space-separated floats or integers)
