@@ -72,13 +72,4 @@ Each signal contributes a dimension to the anomaly model. They’re derived from
 
 ---
 
-### 🛠 Planned Improvements
-
-- [ ] Compile- or runtime mode switching
-- [ ] UART-triggered inference or real-time streaming support
-- [ ] Outlier index extraction script for mapping results back to dataset
-- [ ] Optional feedback interface (LED, GPIO, or telemetry packet)
-
----
-
 License GPL v.2
