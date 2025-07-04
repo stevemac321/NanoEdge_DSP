@@ -55,7 +55,7 @@ The next design decision is how to organize *modes of operation*. These will con
 * Minimal output (anomaly score, status LED, etc.)
 
 ---
-
+COM Port Reader: https://users.ece.utexas.edu/~valvano/edX/download.html
 ### 🧠 Planned Features
 
 * **Mode selection** (compile-time flag or runtime command)
