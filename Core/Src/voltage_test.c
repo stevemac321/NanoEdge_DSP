@@ -92,9 +92,13 @@ void test_voltage(void)
     // 8. Print results
     printf("Voltage RMS: %f V\n", rms_val);
     printf("Envelope (avg mag of first %d bins): %f\n", envelope_bins, envelope);
+
+    sigprintf("VOLTAGE: ");
     for (int i = 0; i < FFT_BIN_COUNT; i++) {
         printf("Bin %3d: %8.5f\n", i, vfft_magnitude.pbuf[i]);
+        sigprintf("%8.5f ", vfft_magnitude.pbuf[i]);
     }
+    sigprintf("END\n");
 }
 
 

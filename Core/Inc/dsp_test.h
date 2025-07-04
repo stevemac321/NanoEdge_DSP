@@ -4,18 +4,28 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_adc.h"
 #include "arm_math.h"
 #include "main.h"
 
+//#define SIGNAL_FORMAT  // for signal creation mode
+#define INFERENCE_MODE
+
+// for signal formatting
+#ifdef SIGNAL_FORMAT
+  #define printf(...)        do {} while(0)            // silence all verbose/debug logging
+#endif
+
+void sigprintf(const char *fmt, ...);
 // Constants
 #define ADC_SIZE       128                  // Number of real ADC samples
 #define FFT_BIN_COUNT  ADC_SIZE             // Number of complex frequency bins
 #define FFT_BUFFER_SIZE (2 * ADC_SIZE)      // Interleaved real + imag
 #define FIR_TAP_NUM    5
 
-#define CPU_LOAD_ITERATIONS 20
+#define CPU_LOAD_ITERATIONS 128
 
 #define REUSABLE_CAPACITY 1024
 #define DSP_TEST_COUNT 10
@@ -86,6 +96,22 @@ uint32_t RTC_Get_Seconds(void);
 #define DSP_TEST_UART_TRAFFIC     7
 #define DSP_TEST_ADC_NOISE_FLOOR  8
 #define DSP_TEST_CLOCK_DRIFT      9
+
+#if 0
+const char* dsp_signal_ids[] = {
+    "VOLTAGE",
+    "TEMP",
+    "CPU",
+    "RAM",
+    "PWR",
+    "CORE",
+    "LOOP",
+    "UART",
+    "NOISE",
+    "CLK"
+};
+#endif
+
 
 #endif // DSP_H
 

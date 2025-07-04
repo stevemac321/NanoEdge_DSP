@@ -44,17 +44,16 @@ void test_ram_usage(void)
 {
     static float filtered_stack_usage = 0.0f;
 
-    size_t stack_used = get_stack_usage_bytes();
 
-    // Apply low-pass filter: simple exponential smoothing
+    size_t stack_used = get_stack_usage_bytes();
     filtered_stack_usage = 0.9f * filtered_stack_usage + 0.1f * (float)stack_used;
 
     printf("RAM Usage Test:\n");
-    printf("  Stack used: %d bytes\n", stack_used);
+    printf("  Stack used: %d bytes\n", (int)stack_used);
     printf("  Filtered Stack Usage: %.1f bytes\n", filtered_stack_usage);
 
-    // Optional threshold detection
     if (stack_used > 0.9 * STACK_SIZE_BYTES) {
         printf("  WARNING: High stack usage!\n");
     }
+
 }

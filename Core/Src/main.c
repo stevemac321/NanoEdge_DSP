@@ -24,6 +24,8 @@
 #include "stdio.h"
 #include "string.h"
 #include "dsp_test.h"
+#include "NanoEdgeAI.h"
+#include "knowledge.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,12 +35,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define RX_LEN 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define DATA_ROWS 495
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -51,8 +52,9 @@ TIM_HandleTypeDef htim5;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-uint8_t rx_buffer[RX_LEN];
 extern  dsp_fn dsp_tests[];
+extern const float signal_data[DATA_ROWS][DATA_INPUT_USER];
+float inf_call[DATA_INPUT_USER] = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -63,7 +65,7 @@ static void MX_ADC1_Init(void);
 static void MX_TIM5_Init(void);
 static void MX_RTC_Init(void);
 /* USER CODE BEGIN PFP */
-
+void inference();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -110,17 +112,37 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+#ifdef SIGNAL_FORMAT
+ for(int i=0; i < 100; i++) {
   dsp_tests[DSP_TEST_VOLTAGE]();
+  dsp_tests[DSP_TEST_POWER_DRAW]();
+  dsp_tests[DSP_TEST_MCU_CORE_TEMP]();
+  dsp_tests[DSP_TEST_LOOP_JITTER]();
+  dsp_tests[DSP_TEST_ADC_NOISE_FLOOR]();
+  dsp_tests[DSP_TEST_CLOCK_DRIFT]();
+ }
+#endif
+#ifdef DSP_DEMO
+  dsp_tests[DSP_TEST_VOLTAGE](); //sig done
   dsp_tests[DSP_TEST_TEMPERATURE]();
   dsp_tests[DSP_TEST_CPU_LOAD]();
   dsp_tests[DSP_TEST_RAM_USAGE]();
-  dsp_tests[DSP_TEST_POWER_DRAW]();
-  dsp_tests[DSP_TEST_MCU_CORE_TEMP]();
+  dsp_tests[DSP_TEST_POWER_DRAW](); //sig done
+  dsp_tests[DSP_TEST_MCU_CORE_TEMP](); //sig done
   dsp_tests[DSP_TEST_LOOP_JITTER]();
   dsp_tests[DSP_TEST_UART_TRAFFIC]();
   dsp_tests[DSP_TEST_ADC_NOISE_FLOOR]();
   dsp_tests[DSP_TEST_CLOCK_DRIFT]();
+#endif
+#ifdef INFERENCE_MODE
+  enum neai_state status = neai_oneclass_init(knowledge);
+    if(status != NEAI_OK) {
+  	  printf("neai_anomalydetection_init failed %d\r\n", status);
+  	  return 0;
+    }
 
+    inference();
+#endif
   while (1)
   {
     /* USER CODE END WHILE */
@@ -386,6 +408,23 @@ int _write(int file, char *ptr, int len) {
     HAL_UART_Transmit(&huart2, (uint8_t*)ptr, len, HAL_MAX_DELAY);
     return len;
 }
+void inference()
+{
+	int total_outliers = 0;
+	int i=0;
+	  for (; i < DATA_ROWS; i++) {
+	      uint8_t is_outlier= 0;
+	      memcpy(inf_call, signal_data[i], sizeof(inf_call));
+	      enum neai_state status = neai_oneclass(inf_call, &is_outlier);
+	      if(is_outlier) {
+	    	  total_outliers++;
+	      }
+	      printf("Row %d, neai_state = %d, is_outlier = %d\r\n", i, status, is_outlier);
+	  }
+
+	  printf("Total Rows: %d, Total Outliers %d\r\n", i, total_outliers);
+}
+
 /* USER CODE END 4 */
 
 /**

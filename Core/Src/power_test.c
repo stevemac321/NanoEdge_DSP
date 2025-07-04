@@ -32,17 +32,17 @@ void test_power_draw(void)
 
     float rms_power = 0.0f;
 
-    for (int i = 0; i < POWER_SAMPLES; ++i) {
+    sigprintf("PWR ");
+    for (int i = 0; i < 128; ++i) {
         uint16_t raw_adc = read_adc_raw();
         float shunt_voltage = (raw_adc / ADC_MAX_VALUE) * VREF_VOLTAGE;
         float current = shunt_voltage / SHUNT_RESISTANCE_OHMS;
-        float power = VREF_VOLTAGE * current;  // Assume constant Vref
+        float power = VREF_VOLTAGE * current;
 
-        vcurrents.pbuf[i] = current;
-        vpowers.pbuf[i] = power;
-
-        HAL_Delay(5);  // ~200 Hz sampling
+        sigprintf("%8.5f ", power);
+        HAL_Delay(5);  // maintain ~200Hz sample rate
     }
+    sigprintf("END\n");
 
     float avg_power = 0.0f;
     for (int i = 0; i < POWER_SAMPLES; ++i) {

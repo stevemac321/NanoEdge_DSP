@@ -63,9 +63,13 @@ void test_adc_noise_floor(void)
 
     // Print the first few bins (e.g., 0–32 Hz equivalent bins)
     printf("FFT magnitude (bins 0–15):\n");
-    for (int i = 0; i < 16; ++i) {
+    sigprintf("NOISE ");
+    for (int i = 0; i < 128; ++i) {
         printf("  Bin %2d: %.5f\n", i, vfft_output.pbuf[i]);
+        sigprintf("%8.5f ", vfft_output.pbuf[i]);
     }
+    sigprintf("END\n");
+
 }
 
 void Vrefint_ADC1_Init(void)

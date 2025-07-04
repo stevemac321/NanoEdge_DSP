@@ -64,10 +64,13 @@ void test_temperature(void)
 
     // Compute average of filtered results as final temperature
     float sum = 0.0f;
+
     for (int i = 0; i < ADC_SIZE; i++)
     {
         sum += vfiltered_samples.pbuf[i];
+
     }
+
     temp = sum / ADC_SIZE;
 
     // Print temperature - replace printf with your preferred output method

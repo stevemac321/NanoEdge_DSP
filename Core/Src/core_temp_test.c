@@ -32,9 +32,12 @@ void test_mcu_core_temp(void)
 	arm_fir_init_f32(&S, FIR_TAP_NUM, (float32_t *)firCoeffs, firState, 128);
 	arm_fir_f32(&S, vtemps_raw.pbuf, vfiltered_buffer.pbuf, 128);
 
+	sigprintf("CORE ");
 	for(int i=0; i < 128; i++) {
 		printf("Raw: %.2f °C, Filtered: %.2f °C\n", vtemps_raw.pbuf[i], vfiltered_buffer.pbuf[i]);
+		 sigprintf("%8.5f ", vfiltered_buffer.pbuf[i]);
 	}
+	sigprintf("END\n");
 
 	HAL_ADC_DeInit(&hadc1);  // Force reset
 	Reset_ADC1_Init();

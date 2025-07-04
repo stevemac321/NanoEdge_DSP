@@ -128,5 +128,14 @@ float ADCToTemperature(uint32_t adc_val)
     float temp = ((v_sense - V_25) / AVG_SLOPE) + 25.0f;
     return temp;
 }
+void sigprintf(const char *fmt, ...) {
+#ifdef SIGNAL_FORMAT
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+#endif
+}
+
 
 

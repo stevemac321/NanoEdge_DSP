@@ -6,16 +6,40 @@
  */
 #include <dsp_test.h>
 
+#define DELAY 500
+
 extern RTC_HandleTypeDef hrtc;
 
 void test_clock_drift(void)
 {
-    printf("hello from test_clock_drift\n");
+#ifdef SIGNAL_FORMAT
+    sigprintf("CLK ");
+    for (int i = 0; i < 128; i++) {
+        uint32_t t1_ticks = HAL_GetTick();
+        uint32_t t1_rtc = RTC_Get_Seconds();  // You’ll need to implement this
+
+        HAL_Delay(DELAY);  // Wait
+
+        uint32_t t2_ticks = HAL_GetTick();
+        uint32_t t2_rtc = RTC_Get_Seconds();
+
+        float delta_tick_ms = (float)(t2_ticks - t1_ticks);
+        float delta_rtc_sec = (float)(t2_rtc - t1_rtc);
+        float expected_ms = delta_rtc_sec * 1000.0f;
+
+        float drift_ms = delta_tick_ms - expected_ms;
+
+        sigprintf("%8.5f ", drift_ms);  // You could also use drift_pct or ppm
+    }
+    sigprintf("END\n");
+
+#else
+    printf("Clock Drift Test (Single Sample):\n");
 
     uint32_t t1_ticks = HAL_GetTick();
-    uint32_t t1_rtc = RTC_Get_Seconds();  // Stub: implement this
+    uint32_t t1_rtc = RTC_Get_Seconds();
 
-    HAL_Delay(3000);  // Wait ~3 seconds
+    HAL_Delay(3000);
 
     uint32_t t2_ticks = HAL_GetTick();
     uint32_t t2_rtc = RTC_Get_Seconds();
@@ -27,10 +51,10 @@ void test_clock_drift(void)
     float drift_ms = delta_tick_ms - expected_ms;
     float drift_pct = 100.0f * drift_ms / expected_ms;
 
-    printf("Clock drift test:\n");
     printf("  ΔTick = %.2f ms\n", delta_tick_ms);
     printf("  ΔRTC  = %.2f s (%.2f ms)\n", delta_rtc_sec, expected_ms);
     printf("  Drift = %.2f ms (%.2f%%)\n", drift_ms, drift_pct);
+#endif
 }
 uint32_t RTC_Get_Seconds(void)
 {
