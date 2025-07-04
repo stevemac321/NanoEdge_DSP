@@ -71,5 +71,12 @@ Each signal contributes a dimension to the anomaly model. They’re derived from
 📥 [Download here](https://users.ece.utexas.edu/~valvano/edX/download.html)
 
 ---
+🧠 Inference Data Note
+For demonstration purposes, the current inference phase runs directly on the same signal dataset used during NanoEdge AI model training. This ensures predictable results and makes it easy to validate the inference loop and memory management.
+If you’d like to test the model with new or live data, you can:
+- Stream fresh vectors via UART (see NanoEdge_Client)
+- Enable USARTx_IRQHandler() to receive and store incoming vectors dynamically
+- Swap the inference_data.c contents with fresh captured vectors (formatted as const float signal_data[...][128])
 
+----
 License GPL v.2
