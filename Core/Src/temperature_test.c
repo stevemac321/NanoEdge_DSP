@@ -75,6 +75,10 @@ void test_temperature(void)
 
     // Print temperature - replace printf with your preferred output method
     printf("Filtered Temperature: %.2f °C\n", temp);
+
+#ifdef SELF_DIAG_MODE
+    one_inference(vfiltered_samples.pbuf, "TEMP from temperature_test.c");
+#endif
     HAL_ADC_DeInit(&hadc1);  // Force reset
     Reset_ADC1_Init();
 	HAL_Delay(1);               // Wait for temp sensor to stabilize

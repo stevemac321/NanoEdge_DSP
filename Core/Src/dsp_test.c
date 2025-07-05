@@ -46,6 +46,13 @@ void ru_u32_vec_init(struct ru_u32_vec *v, uint32_t *pbuf, const uint16_t length
 	memset(v->pbuf, 0, length * sizeof(uint32_t));
 	v->len = length;
 }
+float normalize(float x, float mean, float scale) {
+    float n = (x - mean) / scale;
+    if (n > 1.0f) n = 1.0f;
+    if (n < -1.0f) n = -1.0f;
+    return n;
+}
+
 void Temp_ADC1_Init(void)
 {
   ADC_ChannelConfTypeDef sConfig = {0};

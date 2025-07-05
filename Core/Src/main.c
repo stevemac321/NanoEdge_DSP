@@ -55,6 +55,8 @@ UART_HandleTypeDef huart2;
 extern  dsp_fn dsp_tests[];
 extern const float signal_data[DATA_ROWS][DATA_INPUT_USER];
 extern float buffer0_128[DATA_INPUT_USER];
+int total_outliers = 0;
+int total_pass = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,6 +68,7 @@ static void MX_TIM5_Init(void);
 static void MX_RTC_Init(void);
 /* USER CODE BEGIN PFP */
 void inference();
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -112,36 +115,58 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
 #ifdef SIGNAL_FORMAT
  for(int i=0; i < 100; i++) {
   dsp_tests[DSP_TEST_VOLTAGE]();
   dsp_tests[DSP_TEST_POWER_DRAW]();
   dsp_tests[DSP_TEST_MCU_CORE_TEMP]();
   dsp_tests[DSP_TEST_LOOP_JITTER]();
-  dsp_tests[DSP_TEST_ADC_NOISE_FLOOR]();
   dsp_tests[DSP_TEST_CLOCK_DRIFT]();
  }
 #endif
-#ifdef DSP_DEMO
-  dsp_tests[DSP_TEST_VOLTAGE](); //sig done
+#ifdef DSP_TEST
+  dsp_tests[DSP_TEST_VOLTAGE]();
   dsp_tests[DSP_TEST_TEMPERATURE]();
   dsp_tests[DSP_TEST_CPU_LOAD]();
   dsp_tests[DSP_TEST_RAM_USAGE]();
-  dsp_tests[DSP_TEST_POWER_DRAW](); //sig done
-  dsp_tests[DSP_TEST_MCU_CORE_TEMP](); //sig done
+  dsp_tests[DSP_TEST_POWER_DRAW]();
+  dsp_tests[DSP_TEST_MCU_CORE_TEMP]();
   dsp_tests[DSP_TEST_LOOP_JITTER]();
   dsp_tests[DSP_TEST_UART_TRAFFIC]();
   dsp_tests[DSP_TEST_ADC_NOISE_FLOOR]();
   dsp_tests[DSP_TEST_CLOCK_DRIFT]();
 #endif
-#ifdef INFERENCE_MODE
+#ifdef INFERENCE_TEST
   enum neai_state status = neai_oneclass_init(knowledge);
     if(status != NEAI_OK) {
   	  printf("neai_anomalydetection_init failed %d\r\n", status);
   	  return 0;
     }
 
-    inference();
+    	inference();
+#endif
+
+#ifdef SELF_DIAG_MODE
+  enum neai_state status = neai_oneclass_init(knowledge);
+	if(status != NEAI_OK) {
+	  printf("neai_anomalydetection_init failed %d\r\n", status);
+	  return 0;
+	}
+	dsp_tests[DSP_TEST_VOLTAGE]();
+	dsp_tests[DSP_TEST_TEMPERATURE]();
+	dsp_tests[DSP_TEST_CPU_LOAD]();
+	dsp_tests[DSP_TEST_RAM_USAGE]();
+	dsp_tests[DSP_TEST_POWER_DRAW]();
+	dsp_tests[DSP_TEST_MCU_CORE_TEMP]();
+	dsp_tests[DSP_TEST_LOOP_JITTER]();
+	dsp_tests[DSP_TEST_CLOCK_DRIFT]();// takes a long time
+
+	printf("================================DIAGNOSTIC RESULTS BEGIN===================================================\n");
+	printf("Total Outliers: %d, Total Pass: %d\n", total_outliers, total_pass);
+	printf("================================DIAGNOSTIC RESULTS END=====================================================\n");
+	total_outliers = 0;
+	total_pass = 0;
 #endif
   while (1)
   {
@@ -409,9 +434,10 @@ int _write(int file, char *ptr, int len) {
     return len;
 }
 
+#ifdef INFERENCE_TEST
 void inference()
 {
-	int total_outliers = 0;
+	total_outliers = 0;
 
 	struct ru_vec vinf_call;
 	ru_vec_init(&vinf_call, buffer0_128, 128, 128);
@@ -429,6 +455,25 @@ void inference()
 
 	  printf("Total Rows: %d, Total Outliers %d\r\n", i, total_outliers);
 }
+#endif
+#ifdef SELF_DIAG_MODE
+
+void one_inference(float inf_buf[128], const char* msg) // call
+{
+	uint8_t  is_outlier = 0;
+	enum neai_state status = neai_oneclass(inf_buf, &is_outlier);
+	  if(is_outlier) {
+		  total_outliers++;
+		  printf("neai_state = %d, is_outlier = %d, %s\r\n", status, is_outlier, msg);
+		  for(int i=0; i <128; i++) {
+			  printf("%8.5f ", inf_buf[i]);
+		  }
+	  } else {
+		  total_pass++;
+	  }
+
+}
+#endif
 /* USER CODE END 4 */
 
 /**

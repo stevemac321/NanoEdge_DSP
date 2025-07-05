@@ -12,6 +12,8 @@ extern uint32_t _estack; // Defined in linker script
 extern uint32_t _estack;
 extern uint32_t _stack_start;
 
+extern float buffer0_128[128];
+
 #define STACK_START  ((uint32_t)&_stack_start)
 #define STACK_END    ((uint32_t)&_estack)
 #define STACK_SIZE_BYTES   (STACK_END - STACK_START)
@@ -43,10 +45,21 @@ size_t get_stack_usage_bytes(void)
 void test_ram_usage(void)
 {
     static float filtered_stack_usage = 0.0f;
+    size_t stack_used = 0;
 
-
-    size_t stack_used = get_stack_usage_bytes();
+#ifdef SELF_DIAG_MODE
+    struct ru_vec vstack;
+    ru_vec_init(&vstack, buffer0_128, 128, 128);
+    for(int i=0; i < 128; i++) {
+#endif
+    stack_used = get_stack_usage_bytes();
     filtered_stack_usage = 0.9f * filtered_stack_usage + 0.1f * (float)stack_used;
+#ifdef SELF_DIAG_MODE
+    float normalized = fminf(fmaxf(filtered_stack_usage / (float)STACK_SIZE_BYTES, 0.0f), 1.0f);
+       vstack.pbuf[i] = normalized;
+    }
+    one_inference(vstack.pbuf, "RAM from ram_test.c");
+#endif
 
     printf("RAM Usage Test:\n");
     printf("  Stack used: %d bytes\n", (int)stack_used);

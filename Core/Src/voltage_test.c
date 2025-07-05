@@ -99,6 +99,12 @@ void test_voltage(void)
         sigprintf("%8.5f ", vfft_magnitude.pbuf[i]);
     }
     sigprintf("END\n");
+#ifdef SELF_DIAG_MODE
+    if (vadc_samples.pbuf[0] < 0.01f) {
+        vadc_samples.pbuf[0] = vadc_samples.pbuf[1];
+    }
+    one_inference(vfft_magnitude.pbuf, "From VOLTAGE voltage_tests.c");
+#endif
 }
 
 

@@ -9,16 +9,19 @@
 #define DELAY 500
 
 extern RTC_HandleTypeDef hrtc;
+extern float buffer0_128[128];
 
 void test_clock_drift(void)
 {
-#ifdef SIGNAL_FORMAT
+#if defined(SIGNAL_FORMAT) || defined(SELF_DIAG_MODE)
+    struct ru_vec vdrift;
+    ru_vec_init(&vdrift, buffer0_128, 128, 128);
     sigprintf("CLK ");
     for (int i = 0; i < 128; i++) {
         uint32_t t1_ticks = HAL_GetTick();
-        uint32_t t1_rtc = RTC_Get_Seconds();  // You’ll need to implement this
+        uint32_t t1_rtc = RTC_Get_Seconds();
 
-        HAL_Delay(DELAY);  // Wait
+        HAL_Delay(DELAY);
 
         uint32_t t2_ticks = HAL_GetTick();
         uint32_t t2_rtc = RTC_Get_Seconds();
@@ -28,10 +31,25 @@ void test_clock_drift(void)
         float expected_ms = delta_rtc_sec * 1000.0f;
 
         float drift_ms = delta_tick_ms - expected_ms;
+        float drift_ppm = (drift_ms / expected_ms) * 1e6f;
 
-        sigprintf("%8.5f ", drift_ms);  // You could also use drift_pct or ppm
+        // Clamp extreme values
+        if (drift_ppm > 100.0f) drift_ppm = 100.0f;
+        if (drift_ppm < -100.0f) drift_ppm = -100.0f;
+
+        float norm = drift_ppm / 100.0f;
+
+        sigprintf("%8.5f ", norm);
+    #ifdef SELF_DIAG_MODE
+        vdrift.pbuf[i] = norm;
+    #endif
     }
+
     sigprintf("END\n");
+
+#ifdef SELF_DIAG_MODE
+    one_inference(vdrift.pbuf, "CLOCK from clock_drift_test.c");
+#endif
 
 #else
     printf("Clock Drift Test (Single Sample):\n");

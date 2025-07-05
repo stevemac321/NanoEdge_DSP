@@ -35,14 +35,19 @@ void test_power_draw(void)
     sigprintf("PWR ");
     for (int i = 0; i < 128; ++i) {
         uint16_t raw_adc = read_adc_raw();
-        float shunt_voltage = (raw_adc / ADC_MAX_VALUE) * VREF_VOLTAGE;
+        float shunt_voltage = ((float)raw_adc / ADC_MAX_VALUE) * VREF_VOLTAGE;
         float current = shunt_voltage / SHUNT_RESISTANCE_OHMS;
         float power = VREF_VOLTAGE * current;
+
+        vpowers.pbuf[i] = power;
 
         sigprintf("%8.5f ", power);
         HAL_Delay(5);  // maintain ~200Hz sample rate
     }
     sigprintf("END\n");
+#ifdef SELF_DIAG_MODE
+    one_inference(vpowers.pbuf, "PWR from power_test.c");
+#endif
 
     float avg_power = 0.0f;
     for (int i = 0; i < POWER_SAMPLES; ++i) {

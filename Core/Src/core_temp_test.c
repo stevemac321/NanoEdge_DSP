@@ -35,10 +35,22 @@ void test_mcu_core_temp(void)
 	sigprintf("CORE ");
 	for(int i=0; i < 128; i++) {
 		printf("Raw: %.2f °C, Filtered: %.2f °C\n", vtemps_raw.pbuf[i], vfiltered_buffer.pbuf[i]);
-		 sigprintf("%8.5f ", vfiltered_buffer.pbuf[i]);
+		float val = vfiltered_buffer.pbuf[i];
+
+		// Clamp core temp (e.g., 20 to 80°C)
+		if (val < 20.0f) val = 20.0f;
+		if (val > 80.0f) val = 80.0f;
+
+		// Normalize to 0.0–1.0
+		float norm = (val - 20.0f) / (80.0f - 20.0f);
+
+		sigprintf("%8.5f ", norm);
+		vfiltered_buffer.pbuf[i] = norm;  // Update buffer for inference
 	}
 	sigprintf("END\n");
-
+#ifdef SELF_DIAG_MODE
+	one_inference(vfiltered_buffer.pbuf, "CORE from core_temp_test.c");
+#endif
 	HAL_ADC_DeInit(&hadc1);  // Force reset
 	Reset_ADC1_Init();
 	HAL_Delay(1);               // Wait for temp sensor to stabilize

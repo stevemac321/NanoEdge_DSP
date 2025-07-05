@@ -10,9 +10,10 @@
 #include "arm_math.h"
 #include "main.h"
 
+// #define DSP_TEST
 //#define SIGNAL_FORMAT  // for signal creation mode
-#define INFERENCE_MODE
-
+//#define INFERENCE_TEST
+#define SELF_DIAG_MODE
 // for signal formatting
 #ifdef SIGNAL_FORMAT
   #define printf(...)        do {} while(0)            // silence all verbose/debug logging
@@ -54,6 +55,7 @@ struct ru_u32_vec {
 void ru_vec_init(struct ru_vec *v, float *pbuf, const uint16_t length, const uint16_t capacity); // zero initialize
 void ru_u32_vec_init(struct ru_u32_vec *v, uint32_t *pbuf, const uint16_t length, const uint16_t capacity); // zero initialize
 
+void one_inference(float inf_buf[128], const char* msg);
 
 typedef void (*dsp_fn)(void);
 
@@ -82,6 +84,7 @@ float read_core_temp_celsius(void);
 float ADCToTemperature(uint32_t adc_val);
 void gather_tx_stats(const char *ptr, int len);
 uint32_t RTC_Get_Seconds(void);
+float normalize(float x, float mean, float scale);
 
 
 // array indexes
@@ -96,22 +99,6 @@ uint32_t RTC_Get_Seconds(void);
 #define DSP_TEST_UART_TRAFFIC     7
 #define DSP_TEST_ADC_NOISE_FLOOR  8
 #define DSP_TEST_CLOCK_DRIFT      9
-
-#if 0
-const char* dsp_signal_ids[] = {
-    "VOLTAGE",
-    "TEMP",
-    "CPU",
-    "RAM",
-    "PWR",
-    "CORE",
-    "LOOP",
-    "UART",
-    "NOISE",
-    "CLK"
-};
-#endif
-
 
 #endif // DSP_H
 

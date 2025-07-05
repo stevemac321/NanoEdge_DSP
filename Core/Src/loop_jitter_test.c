@@ -38,14 +38,18 @@ void test_loop_jitter(void)
         sigprintf("%8.5f ", vloop_deltas.pbuf[i]);
     }
     sigprintf("END\n");
-#else
-    float32_t mean, stddev, variance;
-    arm_mean_f32(vloop_deltas.pbuf, 128, &mean);
-    arm_var_f32(vloop_deltas.pbuf, 128, &variance);
-    arm_std_f32(vloop_deltas.pbuf, 128, &stddev);
-
-    printf("Loop Time Mean: %.2f us\r\n", mean);
-    printf("Loop Time Std Dev (Jitter): %.2f us\r\n", stddev);
-    printf("Loop Time Variance: %.2f\r\n", variance);
 #endif
+
+#ifdef SELF_DIAG_MODE
+    one_inference(vloop_deltas.pbuf, "LOOP from loop_jitter_test.c");
+#endif
+	float32_t mean, stddev, variance;
+	arm_mean_f32(vloop_deltas.pbuf, 128, &mean);
+	arm_var_f32(vloop_deltas.pbuf, 128, &variance);
+	arm_std_f32(vloop_deltas.pbuf, 128, &stddev);
+
+	printf("Loop Time Mean: %.2f us\r\n", mean);
+	printf("Loop Time Std Dev (Jitter): %.2f us\r\n", stddev);
+	printf("Loop Time Variance: %.2f\r\n", variance);
+
 }
