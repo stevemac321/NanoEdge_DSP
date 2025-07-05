@@ -3,7 +3,7 @@
 
 **CMSIS-DSP · Embedded Inference · STM32F401RE · Reusable Buffers**
 
-This project demonstrates real-time anomaly detection on an STM32F401RE using a NanoEdge™-trained outlier model. It streams live sensor data, applies lightweight DSP preprocessing, and runs inference—all under severe memory constraints.
+This project demonstrates real-time outlier detection on an STM32F401RE using a NanoEdge™-trained outlier model. It streams live sensor data, applies lightweight DSP preprocessing, and runs inference—all under severe memory constraints.
 
 Key features:
 
@@ -17,7 +17,7 @@ Key features:
 
 ### 📡 Signal Sources & Processing Techniques
 
-Each signal contributes a dimension to the anomaly model. They’re derived from live hardware measurements or synthetic runtime metrics:
+Each signal contributes a dimension to the outlier model. They’re derived from live hardware measurements or synthetic runtime metrics:
 
 | Signal Source                         | Processing Techniques                           |
 | ------------------------------------- | ----------------------------------------------- |
@@ -30,7 +30,7 @@ Each signal contributes a dimension to the anomaly model. They’re derived from
 | **Loop Time / Jitter**                | Stddev, FFT for noise profiling                 |
 | **UART Traffic**                      | Idle time analysis, packet rate histogram       |
 | **ADC Noise Floor** (idle)            | FFT fingerprinting                              |
-| **Internal Clock Drift**              | Time-domain deltas, anomaly detection           |
+| **Internal Clock Drift**              | Time-domain deltas, outlier detection           |
 
 ---
 
@@ -66,12 +66,12 @@ Each signal contributes a dimension to the anomaly model. They’re derived from
 **Behavior:**
 - Each row = one time window with 128 elements
 - Outputs plain text rows (float or integer)
-- Suited for collecting hundreds of rows to train the anomaly model
+- Suited for collecting hundreds of rows to train the outlier model
 
 ---
 
 #### 🧠 Mode 3: **Inference Mode**
-**Purpose:** Real-time anomaly detection  
+**Purpose:** Real-time outlier detection  
 **Behavior:**
 - Uses NanoEdge’s `neai_oneclass()` on incoming signals
 - Prints classification result, row index, and outlier flag
