@@ -3,7 +3,7 @@
 
 **CMSIS-DSP · Embedded Inference · STM32F401RE · Reusable Buffers**
 
-This project demonstrates real-time outlier detection on an STM32F401RE using a NanoEdge™-trained outlier model. It streams live sensor data, applies lightweight DSP preprocessing, and runs inference—all under severe memory constraints.
+This project demonstrates real-time outlier detection on an STM32F401RE using a NanoEdge™-trained outlier model. It streams live sensor data, applies lightweight DSP preprocessing, and runs inference—all under severe memory constraints. NOTE: the files beginning with "_" can be renamed to "." e.g. .cproject, github does not by default accept "." files perceives them as hidden.
 
 Key features:
 
